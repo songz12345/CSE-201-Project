@@ -1,17 +1,26 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.*;
 
 public class Library {
+	final static int MAX_BOOK_NUMBER = 100;
+	
 	private static JFrame jf;
 	private JPanel subjectPanel, background;
 	private JLabel frontPage, icon, descripTitle;
 	private JButton search, login, signup;
+	private ImageIcon bookImg;
+	private JTextField text;
 	private JTextArea area, description;
 	private JList<String> list;
+	public static ArrayList<Book> lib;
+	public static String searchBuffer;
 	
 	public Library() {
 		jf = new JFrame();
@@ -23,23 +32,60 @@ public class Library {
 		area = new JTextArea();
 		description = new JTextArea();
 		list = new JList<String>();
+		text = new JTextField();
 		init();
 	}
 	
 	/**
-	 * Check if the search key is in the library
+	 * load the book information
+	 */
+	private static void loadBooks() {
+		Scanner in;
+		String line;
+		int index = 0;
+		try {
+			in = new Scanner(new File("BookInfo.txt"));
+			// remove the first line
+			in.nextLine();
+			while (in.hasNextLine()) {
+				line = in.nextLine();
+				if (!line.isEmpty()) {
+			 	    String[] info = new String[6];
+				    info = line.split("/");
+				    // load the date to the lib
+				    lib.add(new Book(info[0], info[1], info[2], info[3], info[4], false, " ", info[5]));
+			        index++;
+				}
+			}
+			in.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Check if the search key is in the library. If it exist, return the index
+	 * otherwise return -1
 	 * @param key
 	 * @return
 	 */
-	public boolean inLibrary(String key) {
-		// search for the book
-		return true;
+	public static int inLibrary(String key) {
+		int i = 0;
+		// search for the book by the title
+		for (Book s : lib) {
+			if (s.getTitle().contains(key)) {
+				return i;
+			} else {
+				i++;
+			}
+		}
+		return -1;
 	}
 	
 	/**
 	 * Retrive the book information from the library as a string based on the key
 	 * e.g.
-	 * "Ancient Greek philosophical school/1975/Errin Crutsinger/philosophy
+	 * "Ancient Greek philosophical school/Errin Crutsinger/1975/philosophy
 	 * / the Ancient Greek Philosophical Schools’ opinion, concerns, and 
 	 * representative.\n"
 	 * 
@@ -59,16 +105,33 @@ public class Library {
 	
 	/**
 	 * 
-	 * @param key
 	 */
-	public void search(String key) {
-		int size = key.length();
-		String title;
-		// if the book exist in the library
-		if (inLibrary(key)) {
-			String info = getBookInfo(key);
+	public void search() {
+		searchBuffer = text.getText();
+		// if didn't find the book in the library
+		// pop up a error window for user
+		int index = inLibrary(searchBuffer);
+		if (index < 0) {
+			JFrame errWindow = new JFrame();
+			errWindow.setTitle("Error");
+			errWindow.setLayout(null);
+			JLabel errMsg = new JLabel("Sorry, we didn't find your book!");
+			errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
+			errMsg.setBounds(40, 0, 300, 100);
+			errWindow.add(errMsg);
+			errWindow.setSize(350, 125);
+			errWindow.setLocationRelativeTo(null);
+			errWindow.setResizable(false);
+			errWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			errWindow.setVisible(true);
+			errWindow.toFront();
 		} else {
-			// pop up new window for book not found.
+			// change description for found book
+			description.setText(lib.get(index).getDescription());
+			// change front page for found book
+			bookImg = new ImageIcon(lib.get(index).getFrontPage());
+			Image img = bookImg.getImage().getScaledInstance(400, 500, Image.SCALE_SMOOTH);
+			frontPage.setIcon(new ImageIcon(img));
 		}
 	}
 	
@@ -105,32 +168,59 @@ public class Library {
 	public boolean addBook(String info) {
 		return true;
 	}
+	
+	/**
+	 * Remove the book from the library
+	 * @param book
+	 * @return
+	 */
+	public boolean removeBook(String book) {
+		return true;
+	}
+	
+	/**
+	 * Issue a fine to a user with its login id, return the fine amount
+	 * @param id
+	 * @return
+	 */
+	public int issueAFine(String id) {
+		int fineAmount = 0;
+		return fineAmount;
+	}
+	
+	/**
+	 * Ban a user if s/he didn't return the book over a month.
+	 * @param id
+	 * @return
+	 */
+	public boolean banAUser(String id) {
+		return true;
+	}
+	
 	/**
 	 * initiation of GUI
 	 */
 	private void init() {
-		jf.setTitle("Librachy");
+		jf.setTitle("Name");
 		jf.setLayout(null);
-		// set background
-//		BufferedImage bg = null;
-//		background = new JPanel() {
-//			@Override
-//			protected void paintComponent(Graphics g) {
-//				super.paintComponent(g);
-//				ImageIcon img = new ImageIcon("background.jpeg");
-//				img.setImage(image);
-//				img.paintIcon(this, g, 0, 0);
-//			}
-//		};
-//		background.setOpaque(true);
-		String[] books = {"The Alchemist"};
-		
+		// book list for drop-down list
+		ArrayList<String> books = new ArrayList<String>();
+		text.setText("");
 		// buttons
 		search.setText("Search");
+		// after press the search button, the text the user has typed would be
+		// stored in searchBuffer to future use.
+		search.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				search();
+			}
+		});
 		login.setText("Log in");
 		signup.setText("Sign up");
 		
-		JTextField text = new JTextField("The Alchemist");
+		
 		// description part
 		description.setText("Nicholas Flamel appeared in J.K. Rowling’s Harry Potter—but did"
 				+ " you know he really lived? And his secrets aren't safe! Discover the truth in book one of "
@@ -139,7 +229,6 @@ public class Library {
 		description.setLineWrap(true);
 		description.setEditable(false);
 		
-		list = new JList<String>(books);
 		JRadioButton rButton1 = new JRadioButton("Chemestry       ");
 		JRadioButton rButton2 = new JRadioButton("Alchemy         ");
 		JRadioButton rButton3 = new JRadioButton("Physics         ");
@@ -150,16 +239,19 @@ public class Library {
 		JRadioButton rButton8 = new JRadioButton("Computer Science");
 		JRadioButton rButton9 = new JRadioButton("Biology         ");
 		
-		// add image
-		ImageIcon bookImg = new ImageIcon("alchemy.jpg");
+		// add icon
 		ImageIcon iconImg = new ImageIcon("icon.jpeg");
-		frontPage = new JLabel(bookImg);
 		icon = new JLabel(iconImg);
+		// initial book's front page
+		bookImg = new ImageIcon("default.jpg");
+		Image img = bookImg.getImage().getScaledInstance(400, 500, Image.SCALE_SMOOTH);
+		frontPage = new JLabel(new ImageIcon(img));
+		// add description part
 		descripTitle = new JLabel("Description");
 		
 		icon.setBounds(5, 5, iconImg.getIconWidth(), iconImg.getIconHeight());
 		icon.setSize(300, 45);
-		frontPage.setBounds(650, 60, 324, 499);
+		frontPage.setBounds(650, 60, 400, 500);
 		descripTitle.setBounds(350, 300, 150, 50);
 		search.setBounds(30, 50, 170, 50);
 		login.setBounds(900, 20, 80, 30);
@@ -194,15 +286,22 @@ public class Library {
 		jf.add(descripTitle);
 		
 		 // set jframe properties
-		jf.setSize(1000, 600);
+		jf.setSize(1100, 600);
 		jf.setLocationRelativeTo(null);
 		jf.setResizable(false);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
 	}
 	
 	public static void main(String[] args) {
+		lib = new ArrayList<Book>();
+		searchBuffer = new String();
 		new Library();
 		jf.setVisible(true);
+		loadBooks();
+		Scanner in = new Scanner(System.in);
+		System.out.print("plaes enter: ");
+		String input = in.nextLine();
+		System.out.println(input);
+		System.out.println(lib.get(inLibrary(input)).getFrontPage());
 	}
 }

@@ -1,10 +1,11 @@
 
 public class Book {
 
-	private String title, author, date, subject, description, checkedOutBy;
+	private String title, author, date, subject, description, checkedOutBy, frontPage;
 	private boolean checkedOut;
 	
-	public Book (String t, String a, String d, String s, String desc, boolean cO, String cOB) {
+	public Book (String t, String a, String d, String s, String desc, 
+			boolean cO, String cOB, String fp) {
 		
 		title = t;
 		author = a;
@@ -13,6 +14,7 @@ public class Book {
 		description = desc;
 		checkedOut = cO;
 		checkedOutBy = cOB;
+		frontPage = fp;
 		
 	}
 	
@@ -38,6 +40,9 @@ public class Book {
 	public String getCheckedOutBy() {	return checkedOutBy;	}
 	public void setCheckedOutBy(String checkedOutBy) {	this.checkedOutBy = checkedOutBy;	}
 
+	public String getFrontPage() {	return frontPage;	}
+	public void setFrontPage(String frontPage) {	this.frontPage = frontPage;	}
+	
 	public boolean isCheckedOut() {	return checkedOut;	}
 	public void setCheckedOut(boolean checkedOut) {	this.checkedOut = checkedOut;	}
 	
