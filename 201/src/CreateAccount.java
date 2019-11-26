@@ -16,6 +16,7 @@ public class CreateAccount {
 	private JTextField textLastName;
 	private JTextField textFirstName;
 	private JTextField textPassword;
+//	public static String[] newUserInfo;
 	
 	/**
 	 * Launch the application.
@@ -95,7 +96,8 @@ public class CreateAccount {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame = new JFrame("Login");
-				
+//				newUserInfo[0] = textUserID.getText();
+//				newUserInfo[1] = textPassword.getText();
 			}
 		});
 		btnLogin.setBounds(139, 232, 117, 29);
@@ -109,5 +111,8 @@ public class CreateAccount {
 		btnCheckDuplicates.setBounds(281, 42, 117, 29);
 		frame.getContentPane().add(btnCheckDuplicates);
 	}
-
+	
+//	public static String[] addNewUser() {
+//		return newUserInfo;
+//	}
 }

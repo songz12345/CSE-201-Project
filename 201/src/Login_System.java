@@ -24,7 +24,8 @@ public class Login_System {
 	private JTextField textUserName;
 	private JPasswordField textPassword;
 	private JLabel lblUser;
-
+//	public static String[] newUserInfo;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -89,6 +90,9 @@ public class Login_System {
 
 				if(password.equals("king") && username.equals("one")) {
 					frame.dispose();
+//					newUserInfo[0] = textUserName.getText();
+//					newUserInfo[1] = textPassword.getText();
+					
 				}
 				else
 				{
@@ -141,4 +145,8 @@ public class Login_System {
 		btnCreateAccount.setBounds(339, 19, 122, 29);
 		frame.getContentPane().add(btnCreateAccount);
 	}
+
+//	public static String[] addNewUser() {
+//		return newUserInfo;
+//	}
 }

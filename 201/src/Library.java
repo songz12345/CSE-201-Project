@@ -3,6 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class Library {
 	private static JFrame jf;
 	private JPanel subjectPanel;
 	private JLabel frontPage, icon, descripTitle, background;
-	private JButton search, login, signup;
+	private JButton search, login, signup, borrow;
 	private ImageIcon bookImg, backgroundImg;
 	private JTextField text;
 	private JTextArea area, description;
@@ -23,12 +24,15 @@ public class Library {
 	public static ArrayList<User> users;
 	public static String searchBuffer;
     public static String[] userInfo;
+    public User currentUser;
+    public boolean isLogged = false;
     
 	public Library() {
 		jf = new JFrame();
 		subjectPanel = new JPanel();
 		search = new JButton();
 		login = new JButton();
+		borrow = new JButton();
 		signup = new JButton();
 		area = new JTextArea();
 		description = new JTextArea();
@@ -124,15 +128,13 @@ public class Library {
 	 * @param key
 	 * @return
 	 */
-	public String getBookInfo(String key) {
-		String info = "";
-//		for (int index = 0; index < size; index++) {
-//		// separate each part
-//		if (key.charAt(index) == '/') {
-//			title = key.substring(0, index);
-//			key = key.substring(index + 1);
-//		}
-		return info;
+	public Book getBookInfo(String key) {
+		for (Book b : lib) {
+			if (key.compareTo(b.getTitle()) == 0) {
+				return b;	
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -159,6 +161,8 @@ public class Library {
 		} else {
 			// change description for found book
 			description.setText(lib.get(index).getDescription());
+//			descripTitle.setBounds(350, 300, 150, 50);
+//			description.setBounds(210, 350, 390, 150);
 			// change front page for found book
 			bookImg = new ImageIcon(lib.get(index).getFrontPage());
 			Image img = bookImg.getImage().getScaledInstance(400, 500, Image.SCALE_SMOOTH);
@@ -166,13 +170,13 @@ public class Library {
 		}
 	}
 	
-	/**
-	 * Check the user file by login ID
-	 */
-	public void verifyUser(User user) {
-		if (user.getUsername())
-	}
-	
+//	/**
+//	 * Check the user file by login ID
+//	 */
+//	public void verifyUser(User user) {
+//		if (user.getUsername())
+//	}
+//	
 	/**
 	 * Borrowing, set the book unavailable
 	 * @param book
@@ -180,7 +184,7 @@ public class Library {
 	 */
 	public boolean borrowBook(Book book) {
 		// if user has logged in
-		if (userInfo[0]) {
+//		if (userInfo[0] != null) {
 			// if the book has been borrowed
 			if (book.isCheckedOut()) { 
 				JFrame errWindow = new JFrame();
@@ -198,26 +202,55 @@ public class Library {
 				return false;
 			} else {
 				// mark book as unavailable and add the book to user's borrowlist
-				book.setCheckedOut(true);
-				book.setCheckedOutBy(user.getUsername);
-				user.getBooksCheckedOut().add(book);
-				return true;
+				if (!isLogged) {
+					JFrame errWindow = new JFrame();
+					errWindow.setTitle("Error");
+					errWindow.setLayout(null);
+					JLabel errMsg = new JLabel("Sorry, You need to login first!");
+					errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
+					errMsg.setBounds(40, 0, 300, 100);
+					errWindow.add(errMsg);
+					errWindow.setSize(350, 125);
+					errWindow.setLocationRelativeTo(null);
+					errWindow.setResizable(false);
+					errWindow.setVisible(true);
+					errWindow.toFront();
+					return false;
+				} else {
+//					book.setCheckedOut(true);
+//					book.setCheckedOutBy(userInfo[0]);
+//					currentUser.getBooksCheckedOut().add(book.getTitle());
+					// pop up new window
+					JFrame newWindow = new JFrame();
+					newWindow.setTitle("Successs");
+					newWindow.setLayout(null);
+					JLabel newMsg = new JLabel("Okay, this book is yours now!");
+					newMsg.setFont(new Font("Serif", Font.PLAIN, 20));
+					newMsg.setBounds(40, 0, 300, 100);
+					newWindow.add(newMsg);
+					newWindow.setSize(350, 125);
+					newWindow.setLocationRelativeTo(null);
+					newWindow.setResizable(false);
+					newWindow.setVisible(true);
+					newWindow.toFront();
+					return true;
+				}
 			}
-		} else {  // if the user hasn't logged in
-			JFrame errWindow = new JFrame();
-			errWindow.setTitle("Error");
-			errWindow.setLayout(null);
-			JLabel errMsg = new JLabel("Sorry, please login first!");
-			errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
-			errMsg.setBounds(40, 0, 300, 100);
-			errWindow.add(errMsg);
-			errWindow.setSize(350, 125);
-			errWindow.setLocationRelativeTo(null);
-			errWindow.setResizable(false);
-			errWindow.setVisible(true);
-			errWindow.toFront();
-			return false;
-		}
+//		} else {  // if the user hasn't logged in
+//			JFrame errWindow = new JFrame();
+//			errWindow.setTitle("Error");
+//			errWindow.setLayout(null);
+//			JLabel errMsg = new JLabel("Sorry, please login first!");
+//			errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
+//			errMsg.setBounds(40, 0, 300, 100);
+//			errWindow.add(errMsg);
+//			errWindow.setSize(350, 125);
+//			errWindow.setLocationRelativeTo(null);
+//			errWindow.setResizable(false);
+//			errWindow.setVisible(true);
+//			errWindow.toFront();
+//			return false;
+//		}
 	}
 	
 	/**
@@ -228,7 +261,7 @@ public class Library {
 	public boolean returnBook(Book book) {
 		book.setCheckedOut(false);
 		book.setCheckedOutBy(null);
-		user.getBooksCheckedOut().remove(book);
+		currentUser.getBooksCheckedOut().remove(book.getTitle());
 		return true;
 	}
 	
@@ -288,7 +321,7 @@ public class Library {
 		jf.setTitle("Librademic");
 		jf.setLayout(null);
 		// book list for drop-down list
-		ArrayList<String> books = new ArrayList<String>();
+//		ArrayList<String> books = new ArrayList<String>();
 		text.setText("");
 		// buttons
 		search.setText("Search");
@@ -308,6 +341,8 @@ public class Library {
 			public void actionPerformed(ActionEvent e) {
 				// load the user information
 				Login_System.main();
+				isLogged = true;
+//				userInfo = Login_System.addNewUser();
 			}
 		});
 		signup.setText("Sign up");
@@ -315,18 +350,28 @@ public class Library {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// trigger the create account class and ask user to create an account
 				CreateAccount.main();
+				isLogged = true;
+//				userInfo = CreateAccount.addNewUser();
 			}
 		});
 		
+		borrow.setText("Borrow");
+		borrow.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Book borrowed = new Book();
+				borrowBook(borrowed);
+			}
+		});
 		// description part
-		description.setText("Nicholas Flamel appeared in J.K. Rowling Harry Potter did"
-				+ " you know he really lived? And his secrets aren't safe! Discover the truth in book one of "
-				+ "the New York Times bestselling series the Secrets of the Immortal Nicholas Flamel.");
 		description.setWrapStyleWord(true);
 		description.setLineWrap(true);
 		description.setEditable(false);
 		
+		// buttons
 		JRadioButton rButton1 = new JRadioButton("Chemestry       ");
 		JRadioButton rButton2 = new JRadioButton("Alchemy         ");
 		JRadioButton rButton3 = new JRadioButton("Physics         ");
@@ -345,25 +390,26 @@ public class Library {
 		Image img1 = backgroundImg.getImage().getScaledInstance(1100, 600, Image.SCALE_SMOOTH);
 		background = new JLabel(new ImageIcon(img1));
 		// initial book's front page
-		bookImg = new ImageIcon("imgs/default.jpg");
+		bookImg = new ImageIcon("imgs/default1.jpg");
 		Image img = bookImg.getImage().getScaledInstance(400, 500, Image.SCALE_SMOOTH);
 		frontPage = new JLabel(new ImageIcon(img));
 		// add description part
 		descripTitle = new JLabel("Description");
 		
-		icon.setBounds(5, 5, iconImg.getIconWidth(), iconImg.getIconHeight());
+		icon.setBounds(30, 5, iconImg.getIconWidth(), iconImg.getIconHeight());
 		icon.setSize(300, 45);
 		background.setBounds(0, 0, 1100, 600);
 		frontPage.setBounds(650, 60, 400, 500);
-		descripTitle.setBounds(350, 300, 150, 50);
 		search.setBounds(30, 50, 170, 50);
 		login.setBounds(900, 20, 80, 30);
 		signup.setBounds(810, 20, 80, 30);
+		borrow.setBounds(990, 20, 80, 30);
 		text.setBounds(210, 50, 390, 50);
 		area.setBounds(30, 150, 470, 450);
-		description.setBounds(210, 350, 390, 150);
 		list.setBounds(215, 100, 380, 150);
 		subjectPanel.setBounds(30, 150, 170, 350);
+		descripTitle.setBounds(350, 300, 150, 50);
+		description.setBounds(210, 350, 390, 150);
 		
 		// subject buttons
 		subjectPanel.add(rButton1);
@@ -381,13 +427,14 @@ public class Library {
 		jf.add(search);
 		jf.add(login);
 		jf.add(signup);
+		jf.add(borrow);
 		jf.add(text);
-		jf.add(list);
-//		jf.add(background);
+//		jf.add(list);
 		jf.add(frontPage);
 		jf.add(icon);
 		jf.add(description);
 		jf.add(descripTitle);
+//		jf.add(background);
 		
 		 // set jframe properties
 		jf.setSize(1100, 600);
