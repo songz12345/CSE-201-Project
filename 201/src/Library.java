@@ -12,10 +12,10 @@ public class Library {
 	final static int MAX_BOOK_NUMBER = 100;
 	
 	private static JFrame jf;
-	private JPanel subjectPanel, background;
-	private JLabel frontPage, icon, descripTitle;
+	private JPanel subjectPanel;
+	private JLabel frontPage, icon, descripTitle, background;
 	private JButton search, login, signup;
-	private ImageIcon bookImg;
+	private ImageIcon bookImg, backgroundImg;
 	private JTextField text;
 	private JTextArea area, description;
 	private JList<String> list;
@@ -27,7 +27,6 @@ public class Library {
 	public Library() {
 		jf = new JFrame();
 		subjectPanel = new JPanel();
-		background = new JPanel();
 		search = new JButton();
 		login = new JButton();
 		signup = new JButton();
@@ -308,7 +307,7 @@ public class Library {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// load the user information
-				new Login_System();
+				Login_System.main();
 			}
 		});
 		signup.setText("Sign up");
@@ -316,8 +315,7 @@ public class Library {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new CreateAccount();
-				// load the user information
+				CreateAccount.main();
 			}
 		});
 		
@@ -342,6 +340,10 @@ public class Library {
 		// add icon
 		ImageIcon iconImg = new ImageIcon("imgs/icon.jpeg");
 		icon = new JLabel(iconImg);
+		//add background
+		backgroundImg = new ImageIcon("imgs/background.jpg");
+		Image img1 = backgroundImg.getImage().getScaledInstance(1100, 600, Image.SCALE_SMOOTH);
+		background = new JLabel(new ImageIcon(img1));
 		// initial book's front page
 		bookImg = new ImageIcon("imgs/default.jpg");
 		Image img = bookImg.getImage().getScaledInstance(400, 500, Image.SCALE_SMOOTH);
@@ -351,6 +353,7 @@ public class Library {
 		
 		icon.setBounds(5, 5, iconImg.getIconWidth(), iconImg.getIconHeight());
 		icon.setSize(300, 45);
+		background.setBounds(0, 0, 1100, 600);
 		frontPage.setBounds(650, 60, 400, 500);
 		descripTitle.setBounds(350, 300, 150, 50);
 		search.setBounds(30, 50, 170, 50);
@@ -380,6 +383,7 @@ public class Library {
 		jf.add(signup);
 		jf.add(text);
 		jf.add(list);
+//		jf.add(background);
 		jf.add(frontPage);
 		jf.add(icon);
 		jf.add(description);

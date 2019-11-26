@@ -1,13 +1,19 @@
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.*;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import javax.swing.JSeparator;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.awt.event.ActionEvent;
@@ -22,11 +28,12 @@ public class Login_System {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	static Login_System window = new Login_System();
+	
+	public static void main() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Login_System window = new Login_System();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -48,7 +55,8 @@ public class Login_System {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(300, 200, 500, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
 		JLabel lblLogin = new JLabel("Login");
@@ -79,9 +87,8 @@ public class Login_System {
 				String password = textPassword.getText();
 				String username = textUserName.getText();
 
-				if(password.contains("king") && username.contains("one")) {
-					textPassword.setText(null);
-					textUserName.setText(null);
+				if(password.equals("king") && username.equals("one")) {
+					frame.dispose();
 				}
 				else
 				{
@@ -134,44 +141,4 @@ public class Login_System {
 		btnCreateAccount.setBounds(339, 19, 122, 29);
 		frame.getContentPane().add(btnCreateAccount);
 	}
-
-	private boolean CheckNull(String userId,String password) {
-		boolean f = false;
-		if(userId.equals("")){
-			f = true;
-		}
-		else {
-			if(password.equals("")){
-				f = true;
-			}
-		}
-		return f;
-	}
-
-
-	private boolean checkUserAndPassword(String user, String password) {
-		boolean result = false;
-		try {
-			FileReader file = new FileReader("D:\\Workspaces\\MyEclipse 8.5\\testGUI.txt");
-			BufferedReader bre = new BufferedReader(file);
-			String str = bre.readLine();
-
-			while(str!=null) {
-				String [] a1 = str.split(",");
-				if(a1[0].equals(user)) {
-					if(a1[1].contentEquals(password)) {
-						result = true;
-					}
-					str = bre.readLine();
-				}
-				file.close();
-			}
-		}catch(Exception ex) {
-			System.out.print("errors");
-
-		}
-		return result;
-	}
-	
-	
 }
