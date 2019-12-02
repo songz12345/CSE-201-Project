@@ -1,0 +1,3 @@
+username            password                borrowed-books
+admin/passwd/[C++ for Dummies]
+one/king/[]
