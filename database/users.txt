@@ -1,6 +1,0 @@
-username            password                borrowed-books
-admin/passwd/[null]
-one/king/[[[[[null, null]]]]]
-two/kings/[[[[[[]]]]]]
-three/kings/[[[[[[]]]]]]
-four/kings/[[[[[[]]]]]]
