@@ -154,7 +154,7 @@ public class CreateAccount {
 		try {
 			File file = new File("database/users.txt");
 			FileWriter fw = new FileWriter(file,true);
-			fw.write(userName + "/" + password);
+			fw.write(userName + "/" + password +"/");
 			fw.write("\n");
 			fw.close();
 		}catch(Exception e) {

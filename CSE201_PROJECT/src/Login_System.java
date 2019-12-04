@@ -93,10 +93,16 @@ public class Login_System {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				String password = textPassword.getText();
-				String username = textUserName.getText();
-
-
+				
+				char[] temp = textPassword.getPassword();
+				String thisPassword = "";
+				for(char c : temp) {
+					thisPassword += c;
+				}
+				
+				password = thisPassword;
+				username = textUserName.getText();
+				
 				if(checkUser(username,password)) {
 					frame.dispose();
 				}
@@ -111,6 +117,26 @@ public class Login_System {
 		});
 		btnLogin.setBounds(6, 223, 117, 29);
 		frame.getContentPane().add(btnLogin);
+		
+		JButton btnForget = new JButton("Forget Password?");
+		btnForget.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ForgetPassword forget = new ForgetPassword();
+				forget.main();
+			}
+		});
+		btnForget.setBounds(300,160,130,21);
+		frame.getContentPane().add(btnForget);
+		
+		JButton btnChangePassword = new JButton("Change Password");
+		btnChangePassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ChangePassword change = new ChangePassword();
+				change.main();
+			}
+		});
+		btnChangePassword.setBounds(300,80,130,21);
+		frame.getContentPane().add(btnChangePassword);
 
 		JButton btnReset = new JButton("Reset");
 		btnReset.addActionListener(new ActionListener() {

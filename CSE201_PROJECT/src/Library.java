@@ -19,7 +19,7 @@ public class Library {
 	private static JFrame jf;
 	private JPanel subjectPanel;
 	private JLabel frontPage, icon, descripTitle, background;
-	private JButton search, login, signup, borrow;
+	private JButton search, login, signup, borrow, ret, viewProfile;
 	private ImageIcon bookImg, backgroundImg;
 	private JTextField text;
 	private JTextArea area, description;
@@ -36,6 +36,8 @@ public class Library {
 		search = new JButton();
 		login = new JButton();
 		borrow = new JButton();
+		ret = new JButton();
+		viewProfile = new JButton();
 		signup = new JButton();
 		area = new JTextArea();
 		description = new JTextArea();
@@ -62,6 +64,7 @@ public class Library {
 			 	    String[] info = new String[6];
 				    info = line.split("/");
 				    // load the date to the lib
+				    //                title   author   year     subject  description
 				    lib.add(new Book(info[0], info[1], info[2], info[3], info[4], false, " ", "imgs/"+info[5]));
 			        index++;
 				}
@@ -195,21 +198,44 @@ public class Library {
 		}
 	}
 	
+	public boolean isBorrowed(Book book) {
+		for (User u : users) {
+			ArrayList<String> borrowedBooks = u.getBooksCheckedOut();
+			for (String s : borrowedBooks) {
+				if (s.equals("[" + book.getTitle() + "]")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * update the user information after borrowing one or more books
 	 */
-	public void updateUser(User user) {
+	public void updateUser(User user, String appendMsg) {
 		for (User u : users) {
 			// if the name matches, update the user information
 			if (u.getUsername().equals(user.getUsername())) {
-				u.setBooksCheckedOut(user.getBooksCheckedOut());
+				int index = users.indexOf(u);
+				ArrayList<String> temp = new ArrayList<String>();
+				ArrayList<String> orig = u.getBooksCheckedOut();
+				for (String s : orig) {
+					temp.add(s);
+				}
+				temp.add(appendMsg);
+				users.get(index).setBooksCheckedOut(temp);
 			}
 		}
 			try {
 				FileWriter fw = new FileWriter("database/users.txt", false);
 				fw.write("username            password                borrowed-books\n");
 				for (User a : users) {
-					fw.write(a.getUsername() + "/" + a.getPassword() + "/" + a.getBooksCheckedOut() + "\n");
+					if(a.getBooksCheckedOut().size() != 0) {
+						fw.write(a.getUsername() + "/" + a.getPassword() + "/" + a.getBooksCheckedOut() + "\n");
+					} else {
+						fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");
+					}
 				}
 				fw.close();
 			} catch (IOException e) {
@@ -230,18 +256,19 @@ public class Library {
 		
 		currentUser.setUsername(username);
 		currentUser.setPassword(password);
+		
 		// if user has logged in
 		if (isLogged) {
 			// if the book has been borrowed
-			if (book.isCheckedOut()) { 
+			if (isBorrowed(book)) {
 				JFrame errWindow = new JFrame();
 				errWindow.setTitle("Error");
 				errWindow.setLayout(null);
 				JLabel errMsg = new JLabel("Sorry, this book is unavailable right now!");
 				errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
-				errMsg.setBounds(40, 0, 300, 100);
+				errMsg.setBounds(40, 0, 400, 100);
 				errWindow.add(errMsg);
-				errWindow.setSize(350, 125);
+				errWindow.setSize(450, 125);
 				errWindow.setLocationRelativeTo(null);
 				errWindow.setResizable(false);
 				errWindow.setVisible(true);
@@ -267,7 +294,7 @@ public class Library {
 					book.setCheckedOut(true);
 					book.setCheckedOutBy(currentUser.getUsername());
 					// append the new book user borrowed to its profile
-					updateUser(currentUser);
+					updateUser(currentUser, book.getTitle());
 					// pop up new window
 					JFrame newWindow = new JFrame();
 					newWindow.setTitle("Successs");
@@ -307,9 +334,38 @@ public class Library {
 	 * @return
 	 */
 	public boolean returnBook(Book book) {
-		book.setCheckedOut(false);
-		book.setCheckedOutBy(null);
-		currentUser.getBooksCheckedOut().remove(book.getTitle());
+		int index = 0;
+		ArrayList<String> temp = null;
+		// loop through the users list
+		for (User u : users) {
+			ArrayList<String> borrowedBooks = u.getBooksCheckedOut();
+			// if find the book been checked out, remove it from the 
+			// checked list, save the index of that user.
+			if ( borrowedBooks.contains(book.getTitle()) ) {
+				index = users.indexOf(u);
+				borrowedBooks.remove(book.getTitle());
+				temp = borrowedBooks;
+			}
+		}
+		users.get(index).setBooksCheckedOut(temp);
+		int bookIndex = inLibrary(book.getTitle());
+		lib.get(bookIndex).setCheckedOut(false);
+		lib.get(bookIndex).setCheckedOutBy(users.get(index).getUsername());
+		
+		try {
+			FileWriter fw = new FileWriter("database/users.txt", false);
+			fw.write("username            password                borrowed-books\n");
+			for (User a : users) {
+				if(a.getBooksCheckedOut().size() != 0) {
+					fw.write(a.getUsername() + "/" + a.getPassword() + "/" + a.getBooksCheckedOut() + "\n");
+				} else {
+					fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");
+				}
+			}
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 	
@@ -319,15 +375,20 @@ public class Library {
 	 * @return
 	 */
 	public boolean addBook(String info) {
+		// if it is the librarian logged in
+		if (Login_System.username.equals("admin")) {
+			
+		}
+		
 		String[] infos = new String[6];
 		// seperate the info to 6 parts
 	    infos = info.split("/");
 	    Book newbook = new Book(infos[0], infos[1], infos[2], infos[3], infos[4], false, " ", infos[5]);
 	    // if the book is already exists in the library
 	    if (inLibrary(newbook.getTitle()) != -1) {
-	    	return false;
+	    		return false;
 	    } else {
-	    	lib.add(newbook);
+	    		lib.add(newbook);
 			return true;
 	    }
 	}
@@ -406,8 +467,53 @@ public class Library {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Book borrowed = new Book();
+				int index = inLibrary(searchBuffer);
+				Book borrowed = lib.get(index);
 				borrowBook(borrowed);
+			}
+		});
+		ret.setText("Return");
+		ret.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int index = inLibrary(searchBuffer);
+				Book returned = lib.get(index);
+				returnBook(returned);
+				
+			}
+		});
+		viewProfile.setText("Profile");
+		viewProfile.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFrame profileWindow = new JFrame();
+				profileWindow.setTitle("Profile");
+				profileWindow.setLayout(null);
+				JLabel username = new JLabel("User name: " + Login_System.username);
+				username.setFont(new Font("Serif", Font.PLAIN, 20));
+				username.setBounds(40, 0, 460, 100);
+				ArrayList<String> temp = new ArrayList<String>();
+				for (User u : users) {
+					if (u.getUsername().equals(Login_System.username) ) {
+						temp = u.getBooksCheckedOut();
+					}
+				}
+				JLabel title = new JLabel("Books you borrowed: ");
+				JTextArea bookBorrowed = new JTextArea("" + temp);
+				title.setFont(new Font("Serif", Font.PLAIN, 20));
+				bookBorrowed.setBounds(40, 120, 260, 100);
+				title.setBounds(40, 60, 460, 100);
+				profileWindow.add(title);
+				profileWindow.add(username);
+				profileWindow.add(bookBorrowed);
+				profileWindow.setSize(500, 300);
+				profileWindow.setLocationRelativeTo(null);
+				profileWindow.setResizable(false);
+				profileWindow.setVisible(true);
+				profileWindow.toFront();
+				
 			}
 		});
 		// description part
@@ -529,9 +635,11 @@ public class Library {
 		background.setBounds(0, 0, 1100, 600);
 		frontPage.setBounds(650, 60, 400, 500);
 		search.setBounds(30, 50, 170, 50);
-		login.setBounds(900, 20, 80, 30);
-		signup.setBounds(810, 20, 80, 30);
-		borrow.setBounds(990, 20, 80, 30);
+		login.setBounds(720, 20, 80, 30);
+		ret.setBounds(900, 20, 80, 30);
+		viewProfile.setBounds(990, 20, 80, 30);
+		signup.setBounds(630, 20, 80, 30);
+		borrow.setBounds(810, 20, 80, 30);
 		text.setBounds(210, 50, 390, 50);
 		area.setBounds(30, 150, 470, 450);
 		list.setBounds(215, 100, 380, 150);
@@ -556,6 +664,8 @@ public class Library {
 		jf.add(login);
 		jf.add(signup);
 		jf.add(borrow);
+		jf.add(ret);
+		jf.add(viewProfile);
 		jf.add(text);
 //		jf.add(list);
 		jf.add(frontPage);
