@@ -18,7 +18,7 @@ public class Library {
 	
 	private static JFrame jf;
 	private JPanel subjectPanel;
-	private JLabel frontPage, icon, descripTitle, background;
+	private JLabel frontPage, icon, descripTitle, background, bookName;
 	private JButton search, login, signup, borrow, ret, viewProfile;
 	private ImageIcon bookImg, backgroundImg;
 	private JTextField text;
@@ -186,6 +186,8 @@ public class Library {
 				errWindow.setVisible(true);
 				errWindow.toFront();
 			} else {
+				bookName.setText(lib.get(index).getTitle());
+				bookName.setFont(new Font("Serif", Font.PLAIN, 20));
 				// change description for found book
 				description.setText(lib.get(index).getDescription());
 //				descripTitle.setBounds(350, 300, 150, 50);
@@ -229,13 +231,17 @@ public class Library {
 			}
 		}
 			try {
+				String books = "";
 				FileWriter fw = new FileWriter("database/users.txt", false);
 				fw.write("username            password                borrowed-books\n");
 				for (User a : users) {
-					if(a.getBooksCheckedOut() == null) {
+					if(a.getBooksCheckedOut() == null || a.getBooksCheckedOut().size() == 0) {
 						fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");		
 					} else {
-						fw.write(a.getUsername() + "/" + a.getPassword() + "/" + a.getBooksCheckedOut() + "\n");
+						for (String str : a.getBooksCheckedOut()) {
+							books = books + "/" + str;
+						}
+						fw.write(a.getUsername() + "/" + a.getPassword() + books + "\n");
 					}
 				}
 				fw.close();
@@ -355,13 +361,17 @@ public class Library {
 		lib.get(bookIndex).setCheckedOutBy(users.get(index).getUsername());
 		
 		try {
+			String books = "";
 			FileWriter fw = new FileWriter("database/users.txt", false);
 			fw.write("username            password                borrowed-books\n");
 			for (User a : users) {
-				if(a.getBooksCheckedOut() == null) {
+				if(a.getBooksCheckedOut() == null || a.getBooksCheckedOut().size() == 0) {
 					fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");
 				} else {
-					fw.write(a.getUsername() + "/" + a.getPassword() + "/" + a.getBooksCheckedOut() + "\n");
+					for (String str : a.getBooksCheckedOut()) {
+						books = books + "/" + str;
+					}
+					fw.write(a.getUsername() + "/" + a.getPassword() + books + "\n");
 				}
 			}
 			fw.close();
@@ -503,9 +513,13 @@ public class Library {
 					}
 				}
 				JLabel title = new JLabel("Books you borrowed: ");
-				JTextArea bookBorrowed = new JTextArea("" + temp);
+				String booksName = "";
+				for (String s : temp) {
+					booksName += s + "\n";
+				}
+				JTextArea bookBorrowed = new JTextArea("" + booksName);
 				title.setFont(new Font("Serif", Font.PLAIN, 20));
-				bookBorrowed.setBounds(40, 120, 260, 100);
+				bookBorrowed.setBounds(40, 120, 400, 100);
 				title.setBounds(40, 60, 460, 100);
 				profileWindow.add(title);
 				profileWindow.add(username);
@@ -551,7 +565,7 @@ public class Library {
 				subject = subject.trim();
 			}
 		});
-		JRadioButton rButton4 = new JRadioButton("Math            ");
+		JRadioButton rButton4 = new JRadioButton("Economy          ");
 		rButton4.addActionListener(new ActionListener() {
 			
 			@Override
@@ -631,6 +645,8 @@ public class Library {
 		frontPage = new JLabel(new ImageIcon(img));
 		// add description part
 		descripTitle = new JLabel("Description");
+		// add book name
+		bookName = new JLabel();
 		
 		icon.setBounds(30, 5, iconImg.getIconWidth(), iconImg.getIconHeight());
 		icon.setSize(300, 45);
@@ -643,6 +659,7 @@ public class Library {
 		signup.setBounds(630, 20, 80, 30);
 		borrow.setBounds(810, 20, 80, 30);
 		text.setBounds(210, 50, 390, 50);
+		bookName.setBounds(210, 100, 700, 50);
 		area.setBounds(30, 150, 470, 450);
 		list.setBounds(215, 100, 380, 150);
 		subjectPanel.setBounds(30, 150, 170, 350);
@@ -672,6 +689,7 @@ public class Library {
 //		jf.add(list);
 		jf.add(frontPage);
 		jf.add(icon);
+		jf.add(bookName);
 		jf.add(description);
 		jf.add(descripTitle);
 //		jf.add(background);
