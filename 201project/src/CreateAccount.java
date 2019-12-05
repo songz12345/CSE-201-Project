@@ -23,6 +23,8 @@ public class CreateAccount {
 	private JTextField textLastName;
 	private JTextField textFirstName;
 	private JTextField textPassword;
+	public static String username = "";
+	public static String password = "";
 //	public static String[] newUserInfo;
 	
 	/**
@@ -103,10 +105,11 @@ public class CreateAccount {
 		JButton btnCompleted = new JButton("Completed");
 		btnCompleted.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
 				writeToFile(textUserID.getText(),textPassword.getText());
-//				newUserInfo[0] = textUserID.getText();
-//				newUserInfo[1] = textPassword.getText();
+				username = textUserID.getText();
+				password = textPassword.getText();
+				frame.dispose();
+				
 			}
 		});
 		btnCompleted.setBounds(139, 232, 117, 29);

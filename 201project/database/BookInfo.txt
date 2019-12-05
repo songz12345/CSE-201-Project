@@ -2,8 +2,8 @@ Title                Author                Date (year)        Subject           
 User Interface for Dummies/Victor Farmer/2006/Computer Science/The basics of computer science for those with little experience[c]/default.jpg
 JavaScript for Dummies/James Poe/2004/Computer Science/The basic workings behind JavaScript. Learn to code JavaScript like a pro with the help of this book!/javascript.jpg
 C++ for Dummies/Eleanor Posner/1996/Computer Science/Understand the power C++ can harness and the endless tasks that can be completed with it by using this book./cpp.jpg
-Ancient Greek Philosophical School/Errin Crutsinger/1975/Philosophy/The Ancient Greek Philosophical Schools/default.jpg
-Medieval Religious Philosophy/Maggie Herndon/1986/Philosophy/Exploring why European philosophy in the Middle Ages revolved around religion/default.jpg
+War and economy in the third reich/R.J.Overy/1975/Economy/The Ancient Greek Philosophical Schools/war_economy.jpg
+Write no matter what/Maggie Herndon/1986/Philosophy/Exploring why European philosophy in the Middle Ages revolved around religion/wnmw.jpg
 Philosophical Development and Social Change in the Renaissance/Lisa Cohen/2013/Philosophy/default/default.jpg
 Existentialism and Nihilism/Astead Lerer/1968/Philosophy/Explains the interrelationship between two modern philosophical schools, and their impact on literary creation/default.jpg
 Philosophy Categories/Patricia Disa/2001/Philosophy/Discusses major branches and special branches of philosophy, and their influence on other disciplines/default.jpg
