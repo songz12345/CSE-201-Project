@@ -1,7 +1,8 @@
 username            password                borrowed-books
 123/1234/
-four/kings/C++ for Dummies
-one/king/Write no matter what/JavaScript for Dummies
+four/kings/
+one/king/
 admin/passwd/
-two/kings/
+two/kings/War and economy in the third reich/User Interface for Dummies
 three/kings/
+11/11/Write no matter what
