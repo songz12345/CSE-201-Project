@@ -50,7 +50,7 @@ public class Library {
 	/**
 	 * load the book information
 	 */
-	private static void loadBooks() {
+	public static void loadBooks() {
 		Scanner in;
 		String line;
 		int index = 0;
@@ -78,7 +78,7 @@ public class Library {
 	/**
 	 * load the user information
 	 */
-	private static void loadUsers() {
+	public static void loadUsers() {
 		Scanner in;
 		String line;
 		try {
@@ -299,40 +299,24 @@ public class Library {
 				return false;
 			} else { // if the book hasn't been borrowed
 				// mark book as unavailable and add the book to user's borrowlist
-				if (!isLogged) {
-					JFrame errWindow = new JFrame();
-					errWindow.setTitle("Error");
-					errWindow.setLayout(null);
-					JLabel errMsg = new JLabel("Sorry, you need to login first!");
-					errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
-					errMsg.setBounds(40, 0, 300, 100);
-					errWindow.add(errMsg);
-					errWindow.setSize(350, 125);
-					errWindow.setLocationRelativeTo(null);
-					errWindow.setResizable(false);
-					errWindow.setVisible(true);
-					errWindow.toFront();
-					return false;
-				} else {
-					book.setCheckedOut(true);
-					book.setCheckedOutBy(currentUser.getUsername());
-					// append the new book user borrowed to its profile
-					updateUser(currentUser, book.getTitle());
-					// pop up new window
-					JFrame newWindow = new JFrame();
-					newWindow.setTitle("Successs");
-					newWindow.setLayout(null);
-					JLabel newMsg = new JLabel("Okay, this book is yours now!");
-					newMsg.setFont(new Font("Serif", Font.PLAIN, 20));
-					newMsg.setBounds(40, 0, 300, 100);
-					newWindow.add(newMsg);
-					newWindow.setSize(350, 125);
-					newWindow.setLocationRelativeTo(null);
-					newWindow.setResizable(false);
-					newWindow.setVisible(true);
-					newWindow.toFront();
-					return true;
-				}
+				book.setCheckedOut(true);
+				book.setCheckedOutBy(currentUser.getUsername());
+				// append the new book user borrowed to its profile
+				updateUser(currentUser, book.getTitle());
+				// pop up new window
+				JFrame newWindow = new JFrame();
+				newWindow.setTitle("Success");
+				newWindow.setLayout(null);
+				JLabel newMsg = new JLabel("Okay, this book is now yours!");
+				newMsg.setFont(new Font("Serif", Font.PLAIN, 20));
+				newMsg.setBounds(40, 0, 300, 100);
+				newWindow.add(newMsg);
+				newWindow.setSize(350, 125);
+				newWindow.setLocationRelativeTo(null);
+				newWindow.setResizable(false);
+				newWindow.setVisible(true);
+				newWindow.toFront();
+				return true;
 			}
 		} else {  // if the user hasn't logged in
 			JFrame errWindow = new JFrame();
@@ -357,6 +341,24 @@ public class Library {
 	 * @return
 	 */
 	public boolean returnBook(Book book) {
+		String username = Login_System.username;
+		String password = Login_System.password;
+		boolean isLogged = Login_System.isLogged;
+		if (!isLogged) {
+			JFrame errWindow = new JFrame();
+			errWindow.setTitle("Error");
+			errWindow.setLayout(null);
+			JLabel errMsg = new JLabel("Sorry, please login first!");
+			errMsg.setFont(new Font("Serif", Font.PLAIN, 20));
+			errMsg.setBounds(40, 0, 300, 100);
+			errWindow.add(errMsg);
+			errWindow.setSize(350, 125);
+			errWindow.setLocationRelativeTo(null);
+			errWindow.setResizable(false);
+			errWindow.setVisible(true);
+			errWindow.toFront();
+			return false;
+		} else {
 		int index = 0;
 		ArrayList<String> temp = null;
 		// loop through the users list
@@ -403,6 +405,7 @@ public class Library {
 			e.printStackTrace();
 		}
 		return true;
+		}
 	}
 	
 //	/**
@@ -597,7 +600,7 @@ public class Library {
 				subject = subject.trim();
 			}
 		});
-		JRadioButton rButton4 = new JRadioButton("Economy         ");
+		JRadioButton rButton4 = new JRadioButton("Economy          ");
 		rButton4.addActionListener(new ActionListener() {
 			
 			@Override
