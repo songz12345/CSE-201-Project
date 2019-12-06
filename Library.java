@@ -87,22 +87,26 @@ public class Library {
 			in.nextLine();
 			while (in.hasNextLine()) {
 				line = in.nextLine();
-				if (!line.isEmpty()) {
+				if (!line.isEmpty() && line.length() != 0) {
 					User user = new User();
 					ArrayList<String> borrowedBooks = new ArrayList<String>();
 			 	    String[] info = line.split("/");
-				    // load the user date to the users
-				    user.setUsername(info[0]);
-				    user.setPassword(info[1]);
-				    for (int i = 2; i <= info.length; i++) {
-				    		if (i >= info.length) {
-				    			break;
-				    		} else {
-				    			borrowedBooks.add(info[i]);
-				    		}
-				    }
-				    user.setBooksCheckedOut(borrowedBooks);
-				    users.add(user);
+			 	   if (info == null || info.length == 0) {
+			           break;
+			        } else {
+					    // load the user date to the users
+					    user.setUsername(info[0]);
+					    user.setPassword(info[1]);
+					    for (int i = 2; i <= info.length; i++) {
+					    		if (i >= info.length) {
+					    			break;
+					    		} else {
+					    			borrowedBooks.add(info[i]);
+					    		}
+					    }
+					    user.setBooksCheckedOut(borrowedBooks);
+					    	users.add(user);
+			        }
 				}
 			}
 			in.close();
@@ -119,6 +123,7 @@ public class Library {
 	 */
 	public static int inLibrary(String key) {
 		int i = 0;
+		if (lib == null) return -1;
 		// search for the book by the title
 		for (Book s : lib) {
 			if (s.getTitle().contains(key)) {
@@ -141,6 +146,7 @@ public class Library {
 	 * @return
 	 */
 	public Book getBookInfo(String key) {
+		if (lib == null) return null;
 		for (Book b : lib) {
 			if (key.compareTo(b.getTitle()) == 0) {
 				return b;	
@@ -152,8 +158,7 @@ public class Library {
 	/**
 	 * 
 	 */
-	public void search() {
-		searchBuffer = text.getText();
+	public void search(String searchBuffer) {
 		// if didn't find the book in the library
 		// pop up a error window for user
 		int index = inLibrary(searchBuffer);
@@ -202,11 +207,13 @@ public class Library {
 	
 	public boolean isBorrowed(Book book) {
 		for (User u : users) {
-			if (u.getBooksCheckedOut() == null) return false;
-			ArrayList<String> borrowedBooks = u.getBooksCheckedOut();
-			for (String s : borrowedBooks) {
-				if (s.equals("[" + book.getTitle() + "]")) {
-					return true;
+			if (u.getBooksCheckedOut() == null || u.getBooksCheckedOut().size() == 0) {
+			} else {
+				ArrayList<String> borrowedBooks = u.getBooksCheckedOut();
+				for (String s : borrowedBooks) {
+					if (s.equals(book.getTitle())) {
+						return true;
+					}
 				}
 			}
 		}
@@ -218,30 +225,38 @@ public class Library {
 	 */
 	public void updateUser(User user, String appendMsg) {
 		for (User u : users) {
-			// if the name matches, update the user information
-			if (u.getUsername().equals(user.getUsername())) {
-				int index = users.indexOf(u);
-				ArrayList<String> temp = new ArrayList<String>();
-				ArrayList<String> orig = u.getBooksCheckedOut();
-				for (String s : orig) {
-					temp.add(s);
+			if (u.getUsername().length() <= 0) {
+				break;
+			} else {
+				// if the name matches, update the user information
+				if (u.getUsername().equals(user.getUsername())) {
+					int index = users.indexOf(u);
+					ArrayList<String> temp = new ArrayList<String>();
+					ArrayList<String> orig = u.getBooksCheckedOut();
+					for (String s : orig) {
+						temp.add(s);
+					}
+					temp.add(appendMsg);
+					users.get(index).setBooksCheckedOut(temp);
 				}
-				temp.add(appendMsg);
-				users.get(index).setBooksCheckedOut(temp);
 			}
 		}
 			try {
-				String books = "";
 				FileWriter fw = new FileWriter("database/users.txt", false);
 				fw.write("username            password                borrowed-books\n");
 				for (User a : users) {
-					if(a.getBooksCheckedOut() == null || a.getBooksCheckedOut().size() == 0) {
-						fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");		
+					if (a.getUsername().length() <= 0) {
+						break;
 					} else {
-						for (String str : a.getBooksCheckedOut()) {
-							books = books + "/" + str;
+						if(a.getBooksCheckedOut() == null || a.getBooksCheckedOut().size() == 0) {
+							fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");
+						} else {
+							String books = "";
+							for (String str : a.getBooksCheckedOut()) {
+								books = books + "/" + str;
+							}
+							fw.write(a.getUsername() + "/" + a.getPassword() + books + "\n");
 						}
-						fw.write(a.getUsername() + "/" + a.getPassword() + books + "\n");
 					}
 				}
 				fw.close();
@@ -257,6 +272,7 @@ public class Library {
 	 * @return
 	 */
 	public boolean borrowBook(Book book) {
+		users.add(new User(CreateAccount.username, CreateAccount.password, new ArrayList<String>()));
 		String username = Login_System.username;
 		String password = Login_System.password;
 		boolean isLogged = Login_System.isLogged;
@@ -345,14 +361,18 @@ public class Library {
 		ArrayList<String> temp = null;
 		// loop through the users list
 		for (User u : users) {
-			if (u.getBooksCheckedOut() == null) return false;
-			ArrayList<String> borrowedBooks = u.getBooksCheckedOut();
-			// if find the book been checked out, remove it from the 
-			// checked list, save the index of that user.
-			if ( borrowedBooks.contains(book.getTitle()) ) {
-				index = users.indexOf(u);
-				borrowedBooks.remove(book.getTitle());
-				temp = borrowedBooks;
+			if (u.getUsername().length() <= 0) {
+				break;
+			} else {
+				if (u.getBooksCheckedOut() == null) return false;
+				ArrayList<String> borrowedBooks = u.getBooksCheckedOut();
+				// if find the book been checked out, remove it from the 
+				// checked list, save the index of that user.
+				if ( borrowedBooks.contains(book.getTitle()) ) {
+					index = users.indexOf(u);
+					borrowedBooks.remove(book.getTitle());
+					temp = borrowedBooks;
+				}
 			}
 		}
 		users.get(index).setBooksCheckedOut(temp);
@@ -361,17 +381,21 @@ public class Library {
 		lib.get(bookIndex).setCheckedOutBy(users.get(index).getUsername());
 		
 		try {
-			String books = "";
 			FileWriter fw = new FileWriter("database/users.txt", false);
 			fw.write("username            password                borrowed-books\n");
 			for (User a : users) {
-				if(a.getBooksCheckedOut() == null || a.getBooksCheckedOut().size() == 0) {
-					fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");
+				if (a.getUsername().length() <= 0) {
+					break;
 				} else {
-					for (String str : a.getBooksCheckedOut()) {
-						books = books + "/" + str;
+					if(a.getBooksCheckedOut() == null || a.getBooksCheckedOut().size() == 0) {
+						fw.write(a.getUsername() + "/" + a.getPassword() + "/\n");
+					} else {
+						String books = "";
+						for (String str : a.getBooksCheckedOut()) {
+							books = books + "/" + str;
+						}
+						fw.write(a.getUsername() + "/" + a.getPassword() + books + "\n");
 					}
-					fw.write(a.getUsername() + "/" + a.getPassword() + books + "\n");
 				}
 			}
 			fw.close();
@@ -381,17 +405,16 @@ public class Library {
 		return true;
 	}
 	
-	/**
-	 * Add the book with its related information
-	 * @param info
-	 * @return
-	 */
+//	/**
+//	 * Add the book with its related information
+//	 * @param info
+//	 * @return
+//	 */
 	public boolean addBook(String info) {
-		// if it is the librarian logged in
-		if (Login_System.username.equals("admin")) {
-			
-		}
-		
+//		// if it is the librarian logged in
+//		if (Login_System.username.equals("admin")) {
+//			
+//		}
 		String[] infos = new String[6];
 		// seperate the info to 6 parts
 	    infos = info.split("/");
@@ -401,20 +424,28 @@ public class Library {
 	    		return false;
 	    } else {
 	    		lib.add(newbook);
+	    		try {
+					FileWriter fw = new FileWriter("database/BookInfo.txt", true);
+					fw.write(info + "\n");
+					fw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			return true;
 	    }
 	}
-	
-	/**
-	 * Remove the book from the library
-	 * @param book
-	 * @return
-	 */
-	public boolean removeBook(Book book) {
-		lib.remove(book);
-		return true;
-	}
-	
+//	
+//	/**
+//	 * Remove the book from the library
+//	 * @param book
+//	 * @return
+//	 */
+//	public boolean removeBook(Book book) {
+//		lib.remove(book);
+//		return true;
+//	}
+//	
 //	/**
 //	 * Issue a fine to a user with its login id, return the fine amount
 //	 * @param id
@@ -452,7 +483,8 @@ public class Library {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				search();
+				searchBuffer = text.getText();
+				search(searchBuffer);
 			}
 		});
 		login.setText("Log in");
@@ -538,7 +570,7 @@ public class Library {
 		description.setEditable(false);
 		
 		// buttons
-		JRadioButton rButton1 = new JRadioButton("Chemestry       ");
+		JRadioButton rButton1 = new JRadioButton("Chemistry       ");
 		rButton1.addActionListener(new ActionListener() {
 			
 			@Override
